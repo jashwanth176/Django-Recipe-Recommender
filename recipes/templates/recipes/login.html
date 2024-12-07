@@ -1,0 +1,16 @@
+{% extends 'recipes/base.html' %}
+
+{% block title %}Login - Smart Recipe Recommendation Platform{% endblock %}
+
+{% block content %}
+    <h2>Login</h2>
+    <div class="mb-3">
+        <a href="{% url 'admin:index' %}" class="btn btn-secondary">Admin Login</a>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <a href="{% url 'register' %}">Don't have account? Register here</a>
+{% endblock %}

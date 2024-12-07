@@ -1,0 +1,19 @@
+{% extends 'recipes/base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ recipe.title }} - Smart Recipe Recommendation Platform{% endblock %}
+
+{% block content %}
+    <div class="recipe-content">
+        <h2 style="font-size: 2.2em;">{{ recipe.title }}</h2>
+        {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 100%; height: auto; margin-bottom: 20px;">
+        {% endif %}
+        <h3 style="font-size: 2em;">Ingredients:</h3>
+        <pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 1.7em; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #e0e0e0; color: #000; width: 100%; box-sizing: border-box;">{{ recipe.ingredients|newline_comma }}</pre>
+        <h3 style="font-size: 2em;">Instructions:</h3>
+        <pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 1.7em; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #e0e0e0; color: #000; width: 100%; box-sizing: border-box;">{{ recipe.instructions|newline_comma }}</pre>
+        <p>Created at: {{ recipe.created_at }}</p>
+        <a href="{% url 'home' %}" style="font-size: 1.2em;">Back to Home</a>
+    </div>
+{% endblock %}

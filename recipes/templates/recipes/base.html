@@ -1,0 +1,577 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Recipe Recommendation Platform 🧑‍🍳{% endblock %}</title>
+    <style>
+        .landing-container {
+            text-align: center;
+            padding: 100px 20px;
+            animation: fadeIn 2s ease-in-out;
+            background: rgba(0, 0, 0, 0); /* Semi-transparent background */
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 100px auto;
+        }
+        .landing-container h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        .landing-container p {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+            color: #ffffff;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+        }
+        .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0.3;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 2.5px #fff, 0 0 5px #fff, 0 0 7.5px #4a90e2, 0 0 10px #4a90e2, 0 0 17.5px #4a90e2, 0 0 20px #4a90e2, 0 0 25px #4a90e2;
+            }
+            to {
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #4a90e2, 0 0 15px #4a90e2, 0 0 20px #4a90e2, 0 0 25px #4a90e2, 0 0 30px #4a90e2;
+            }
+        }
+        .rating {
+            font-size: 20px;
+            color: #ffd700;
+            cursor: pointer;
+            display: inline-block; /* Ensure stars are inline-block */
+            z-index: 10; /* Ensure stars are on top */
+            position: relative; /* Ensure stars are positioned correctly */
+        }
+    
+        .rating i {
+            margin-right: 5px;
+        }
+    
+        .rating i:hover,
+        .rating i.fas {
+            color: #ffaa00;
+        }
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #1f1f1f;
+            padding: 1rem;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        main {
+            position: relative;
+            z-index: 1;
+            background-color: rgba(18, 18, 18, 0.7); /* Semi-transparent dark background */
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem auto;
+            max-width: 1200px;
+        }
+        a {
+            color: #bb86fc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        button {
+            background-color: #bb86fc;
+            border: none;
+            color: #ffffff;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #9b67e0;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        form input, form textarea {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background-color: #1f1f1f;
+            border: 1px solid #333;
+            color: #ffffff;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 0.5rem;
+        }
+        .chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #6200ee; /* Modern Purple */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .chatbot-button:hover {
+            background-color: #3700b3;
+            transform: scale(1.1);
+        }
+        .chatbot-modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            bottom: 95px;
+            right: 20px;
+            width: 360px;
+            height: 500px;
+            background-color: rgba(0, 0, 0, 0.85); /* Dark and semi-transparent background */
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth transition */
+            opacity: 0;
+            transform: translateY(20px); /* Start slightly below */
+        }
+        .chatbot-modal.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0); /* Move to original position */
+        }
+        .chatbot-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 0.5rem;
+        }
+        .chatbot-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #bb86fc; /* Light purple for contrast */
+        }
+        .chatbot-modal-header button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #bb86fc; /* Light purple for contrast */
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .chatbot-modal-header button:hover {
+            color: #ffffff;
+        }
+        .chatbot-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 1rem;
+            padding-right: 0.5rem;
+            color: #e0e0e0; /* Light text for readability */
+            
+            /* Added padding for better spacing */
+            padding-left: 1rem;
+            padding-top: 1rem;
+        }
+        .message {
+            margin-bottom: 20px; /* Increased space between messages */
+            padding: 10px; /* Added padding inside each message */
+            background-color: rgba(43, 43, 43, 0.9); /* Slight background for message bubbles */
+            border-radius: 8px; /* Rounded corners for messages */
+        }
+        .message strong {
+            color: #bb86fc; /* Light purple for sender name */
+        }
+        .chatbot-modal-footer {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem; /* Optional: Adds space above the footer */
+        }
+
+        .chatbot-modal-footer input {
+            flex: 1; /* Allows the input to expand and fill available space */
+            padding: 0.75rem;
+            border: 1px solid #555;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            font-size: 1rem;
+            background-color: #2c2c2c; /* Dark input background */
+            color: #ffffff;
+        }
+
+        .chatbot-modal-footer input::placeholder {
+            color: #bbbbbb; /* Lighter placeholder text */
+        }
+
+        .chatbot-modal-footer button {
+            background-color: #bb86fc; /* Light purple */
+            border: none;
+            color: #121212; /* Dark text for contrast */
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        .chatbot-modal-footer button:hover {
+            background-color: #9b67e0;
+        }
+        .play-button {
+            background-color: #bb86fc; /* Light purple */
+            border: none;
+            color: #121212; /* Dark icon for contrast */
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+            margin-left: 10px;
+        }
+        .play-button:hover {
+            background-color: #9b67e0;
+        }
+        .audio-container {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+        .audio-container audio {
+            display: none;
+        }
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .video-background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            filter: blur(100px); /* Adjust the blur amount as needed */
+        }
+        .video-background video {
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+        /* Custom Scrollbar Styling for Chatbot Modal Body */
+        .chatbot-modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chatbot-modal-body::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        .chatbot-modal-body::-webkit-scrollbar-thumb {
+            background-color: #bb86fc;
+            border-radius: 4px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+        }
+        /* For Firefox */
+        .chatbot-modal-body {
+            scrollbar-width: thin;
+            scrollbar-color: #bb86fc rgba(255, 255, 255, 0.1);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="video-background">
+        <video id="bgVideo" autoplay loop muted playsinline>
+            <source src="{% static 'video3.mp4' %}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    <header>
+        <a href="{% url 'home' %}" style="text-decoration: none;">
+            <h1>🍳 Smart Recipe Recommendation Platform 🧑‍🍳</h1>
+        </a>
+    </header>
+    <style>
+        header h1 {
+            margin: 0;
+            font-size: 2.5em; /* Increased font size slightly */
+        }
+    </style>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <div class="chatbot-button" onclick="toggleChatbot()">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    <div class="chatbot-modal" id="chatbotModal">
+        <div class="chatbot-modal-header">
+            <h2>Chatbot</h2>
+            <button onclick="toggleChatbot()" aria-label="Close Chatbot">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chatbot-modal-body" id="chatbotBody">
+            <!-- Chat messages will appear here -->
+        </div>
+        <div class="chatbot-modal-footer">
+            <input type="text" id="chatbotInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </div>
+    </div>
+    <script>
+        if ('speechSynthesis' in window) {
+            console.log("Speech synthesis supported");
+        } else {
+            console.log("Speech synthesis not supported");
+        }
+
+        function toggleChatbot() {
+            const modal = document.getElementById('chatbotModal');
+            modal.classList.toggle('show');
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            var userInput = document.getElementById('chatbotInput').value;
+            if (userInput.trim() === '') return;
+
+            appendMessage('You', userInput);
+            document.getElementById('chatbotInput').value = '';
+
+            fetch('/chatbot/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ message: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
+                appendMessage('Chef', data.response);
+                checkAudioStatus();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function appendMessage(sender, message) {
+            const chatbotBody = document.getElementById('chatbotBody');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatbotBody.appendChild(messageElement);
+            
+            // Smooth scroll to the latest message
+            chatbotBody.scrollTo({
+                top: chatbotBody.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        function checkAudioStatus() {
+            fetch('/check_audio_status/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.audio_ready) {
+                    showAudioIcon();
+                } else {
+                    setTimeout(checkAudioStatus, 500); // Check again after 0.5 seconds
+                }
+            });
+        }
+
+        function showAudioIcon() {
+            const chatbotBody = document.getElementById('chatbotBody');
+            const lastMessage = chatbotBody.lastElementChild;
+            if (lastMessage) {
+                const audioIcon = document.createElement('button');
+                audioIcon.innerHTML = '<i class="fas fa-volume-up"></i>';
+                audioIcon.className = 'play-button';
+                audioIcon.onclick = playAudio;
+                lastMessage.appendChild(audioIcon);
+            }
+        }
+
+        function playAudio() {
+            fetch('/get_audio/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.audio) {
+                    const audio = new Audio("data:audio/mp3;base64," + data.audio);
+                    audio.play();
+                }
+            });
+        }
+
+        function displayMessage(sender, message, audioData) {
+            const chatbotBody = document.getElementById('chatbotBody');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            
+            if (sender === 'Chatbot' && audioData) {
+                const audioContainer = document.createElement('div');
+                audioContainer.className = 'audio-container';
+                
+                const audioElement = document.createElement('audio');
+                audioElement.src = `data:audio/mp3;base64,${audioData}`;
+                
+                const playButton = document.createElement('button');
+                playButton.className = 'play-button';
+                playButton.innerHTML = '<i class="fas fa-play"></i>';
+                playButton.onclick = function() {
+                    if (audioElement.paused) {
+                        audioElement.play();
+                        playButton.innerHTML = '<i class="fas fa-pause"></i>';
+                    } else {
+                        audioElement.pause();
+                        playButton.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                };
+                
+                audioContainer.appendChild(audioElement);
+                audioContainer.appendChild(playButton);
+                messageElement.appendChild(audioContainer);
+            }
+            
+            chatbotBody.appendChild(messageElement);
+            
+            // Smooth scroll to the latest message
+            chatbotBody.scrollTo({
+                top: chatbotBody.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        function fetchChatbotResponse(message) {
+            fetch('/chatbot/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayMessage('Chatbot', data.response, data.audio);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Remove the speak function as it's no longer needed
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var video = document.getElementById('bgVideo');
+
+            video.play().catch(function(error) {
+                console.error('Error playing video:', error);
+            });
+
+            // Set the video speed to 0.25x
+            video.playbackRate = 0.50;
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

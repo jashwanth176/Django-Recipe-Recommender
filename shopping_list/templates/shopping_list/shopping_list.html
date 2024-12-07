@@ -1,0 +1,49 @@
+{% extends 'recipes/base.html' %}
+
+{% block content %}
+<h2>Shopping List</h2>
+<table id="shopping-list" style="width: 100%; font-size: 1.2em; border-collapse: collapse; margin-bottom: 40px;">
+    <thead>
+        <tr>
+            <th style="border: 1px solid #ddd; padding: 20px;">Ingredient</th>
+            <th style="border: 1px solid #ddd; padding: 20px;">Recipe</th>
+            <th style="border: 1px solid #ddd; padding: 20px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr data-item-id="{{ item.id }}">
+            <td style="border: 1px solid #ddd; padding: 20px;">{{ item.ingredient }}</td>
+            <td style="border: 1px solid #ddd; padding: 20px;">{{ item.recipe.title }}</td>
+            <td style="border: 1px solid #ddd; padding: 20px;"><button class="remove-item">Remove</button></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" style="border: 1px solid #ddd; padding: 20px;">Your shopping list is empty.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'home' %}" class="btn btn-primary" style="margin-top: 40px;">Back to Recipes</a>
+
+<script>
+document.querySelectorAll('.remove-item').forEach(button => {
+    button.addEventListener('click', function() {
+        const tr = this.parentElement.parentElement;
+        const itemId = tr.dataset.itemId;
+        fetch(`/shopping-list/remove/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                tr.remove();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'recipes/base.html' %}
+
+{% block title %}Welcome to Smart Recipe Recommendation Platform{% endblock %}
+
+{% block content %}
+<div style="height: 100vh; overflow-x: hidden; overflow-y: auto; perspective: 2px; scrollbar-width: none; -ms-overflow-style: none;" onscroll="this.style.scrollBehavior='smooth';">
+    <style>
+        /* Hide webkit scrollbar */
+        div[style*="overflow-y: auto"]::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+    <div style="position: relative; height: 100vh; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; transform: translateZ(-1px) scale(1.5); z-index: -1; background-size: cover; background-position: center; background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://www.tasteofhome.com/wp-content/uploads/2021/09/indian-food-GettyImages-1127563435-MLedit-FT.jpg');"></div>
+        
+        <div style="text-align: center; padding: 2rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; max-width: 800px; margin: 0 auto;">
+            <h1 style="font-size: 2.5em; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">Smart Recipe Recommendations</h1>
+            <p style="font-size: 1.2em; color: #ffffff; margin-bottom: 2rem; font-weight: 300;">Discover your next culinary adventure</p>
+            <div style="display: flex; justify-content: center; gap: 20px;">
+                <a href="{% url 'register' %}" style="padding: 15px 40px; font-size: 1.2em; border-radius: 50px; transition: all 0.3s ease; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; background: linear-gradient(45deg, #007bff, #00bfff); border: none; color: white; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4); text-decoration: none;">Get Started</a>
+                <a href="{% url 'login' %}" style="padding: 15px 40px; font-size: 1.2em; border-radius: 50px; transition: all 0.3s ease; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 2px solid white; color: white; text-decoration: none;">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: #ffffff; padding: 100px 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto;">
+            <div style="text-align: center; padding: 2rem; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;" data-aos="fade-up">
+                <i class="fas fa-utensils" style="font-size: 2.5em; color: #007bff; margin-bottom: 1rem;"></i>
+                <h3>Personalized Recipes</h3>
+                <p>Tailored recommendations based on your preferences</p>
+            </div>
+            <div style="text-align: center; padding: 2rem; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;" data-aos="fade-up" data-aos-delay="100">
+                <i class="fas fa-clock" style="font-size: 2.5em; color: #007bff; margin-bottom: 1rem;"></i>
+                <h3>Quick & Easy</h3>
+                <p>Find recipes that match your schedule</p>
+            </div>
+            <div style="text-align: center; padding: 2rem; background: #ffffff; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;" data-aos="fade-up" data-aos-delay="200">
+                <i class="fas fa-heart" style="font-size: 2.5em; color: #007bff; margin-bottom: 1rem;"></i>
+                <h3>Save Favorites</h3>
+                <p>Build your personal cookbook</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 50px; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6));"></div>
+
+    <div style="position: relative; height: 100vh; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; transform: translateZ(-1px) scale(1.5); z-index: -1; background-size: cover; background-position: center; background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://w0.peakpx.com/wallpaper/755/638/HD-wallpaper-a-chef-preparing-food-in-the-kitchen-of-a-restaurant-chefs-at-work-kitchen-cooking.jpg');"></div>
+        
+        <div style="text-align: center; color: white;">
+            <h2 style="font-size: 2em; margin-bottom: 2rem;">Ready to start cooking?</h2>
+            <a href="{% url 'register' %}" style="padding: 15px 40px; font-size: 1.2em; border-radius: 50px; transition: all 0.3s ease; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; background: linear-gradient(45deg, #007bff, #00bfff); border: none; color: white; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4); text-decoration: none;">Join Now</a>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+
+    // Add hover effects since we can't use CSS hover with inline styles
+    document.querySelectorAll('a').forEach(button => {
+        button.addEventListener('mouseover', () => {
+            button.style.transform = 'translateY(-3px)';
+            button.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.2)';
+        });
+        button.addEventListener('mouseout', () => {
+            button.style.transform = 'translateY(0)';
+            button.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.4)';
+        });
+    });
+
+    document.querySelectorAll('[style*="transition: transform"]').forEach(card => {
+        card.addEventListener('mouseover', () => {
+            card.style.transform = 'translateY(-10px)';
+        });
+        card.addEventListener('mouseout', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+</script>
+{% endblock %}

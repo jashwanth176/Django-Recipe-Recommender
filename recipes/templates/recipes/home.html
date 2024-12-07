@@ -1,0 +1,411 @@
+{% extends 'recipes/base.html' %}
+{% load static %}
+
+{% block title %}Home - Smart Recipe Management Platform{% endblock %}
+
+{% block content %}
+
+    <div class="content-overlay">
+        <div class="decorative-image"></div>
+    </header>
+    <style>
+        header h1 {
+            margin: 0;
+            font-size: 2.5em; /* Increased font size slightly */
+        }
+    </style>        
+        {% if user.is_authenticated %}
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1>Welcome, {{ user.username }}!</h1>
+                <div>
+                    <a href="{% url 'shopping_list' %}" id="shoppingListBtn" class="btn btn-info">Shopping List</a>
+                    <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">Logout</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Updated Button Container -->
+            <div class="d-flex justify-content-start mb-4">
+                <a href="{% url 'add_recipe' %}" class="btn btn-primary mr-3">Add New Recipe</a>
+                <a href="{% url 'browse_recipes' %}" class="btn btn-success">Browse Recipes</a>
+                <a href="{% url 'diet_plan' %}" class="btn btn-secondary">Diet Plan</a>
+            </div>
+            
+            <h2 style="margin-top: 40px;">Latest Recipes:</h2>
+            <table class="recipe-table" id="recipeTable" style="border: 2px solid rgb(251, 248, 248);">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid rgb(255, 255, 255); padding: 20px;">Title</th> 
+                        <th style="border: 1px solid rgb(255, 255, 255); padding: 20px;">Rating</th> 
+                        <th style="border: 1px solid rgb(247, 247, 250); padding: 20px;">Actions</th> 
+                    </tr>
+                </thead>
+                <tbody id="recipeTableBody">
+                {% for recipe in recipes %}
+                    <tr>
+                        <td style="border: 1px solid rgb(237, 240, 237); padding: 20px;"><a href="{% url 'recipe_detail' recipe.id %}">{{ recipe.title }}</a></td>
+                        <td style="border: 1px solid rgb(254, 255, 254); padding: 20px;">
+                            <div class="rating" data-recipe-id="{{ recipe.id }}">
+                                <i class="far fa-star" data-rating="1"></i>
+                                <i class="far fa-star" data-rating="2"></i>
+                                <i class="far fa-star" data-rating="3"></i>
+                                <i class="far fa-star" data-rating="4"></i>
+                                <i class="far fa-star" data-rating="5"></i>
+                            </div>
+                        </td>
+                        <td style="border: 1px solid rgb(254, 255, 254); padding: 20px;">
+                            <button class="btn btn-success add-to-shopping-list" data-recipe-id="{{ recipe.id }}">Add</button>
+                            <a href="{% url 'edit_recipe' recipe.id %}" class="btn btn-secondary">Edit</a>
+                            <form action="{% url 'delete_recipe' recipe.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" style="border: 1px solid rgb(0, 8, 0); padding: 20px;">No recipes available.</td> 
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Add from AI Section -->
+            <h2 style="margin-top: 40px;">Add Recipe from AI</h2>
+            <div id="addFromAI">
+                <input type="text" id="aiRecipeInput" placeholder="@add recipe: title; ingredients; instructions">
+                <button id="addAIRecipe">Add Recipe</button>
+                <div id="aiRecipeResponse"></div>
+            </div>
+
+
+        {% else %}
+            <div class="login-container">
+                <div class="login-header">
+                    <h3 style="font-size: 1.3em;">Welcome Back</h3>
+                    <p style="font-size: 1.3em;">Log in to access your recipes</p>
+                </div>
+                <form method="post" action="{% url 'login' %}" class="login-form">
+                    {% csrf_token %}
+                    {% for field in login_form %}
+                        <div class="form-group" style="font-size: 1.3em;">
+                            <div class="input-group">
+                                <span class="input-group-icon">
+                                    <i class="fas fa-{% if field.name == 'username' %}user{% else %}lock{% endif %}"></i>
+                                </span>
+                                {{ field }}
+                            </div>
+                            {% if field.errors %}
+                                <div class="error-message" style="font-size: 1.3em;">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ field.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block" style="font-size: 1.3em;">
+                            <i class="fas fa-sign-in-alt"></i> Log In
+                        </button>
+                    </div>
+                </form>
+                <div class="login-footer">
+                    <p class="register-link" style="font-size: 1.3em;">New to our platform? <a href="{% url 'register' %}">Create an account</a></p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Shopping List Modal -->
+
+{% endblock %}
+
+{% block styles %}
+<style>
+    .rating {
+        font-size: 24px;
+        color: #ffd700;
+        cursor: pointer;
+        display: inline-block; /* Ensure stars are inline-block */
+        z-index: 10; /* Ensure stars are on top */
+        position: relative; /* Ensure stars are positioned correctly */
+    }
+
+    .rating i {
+        margin-right: 5px;
+    }
+
+    .rating i:hover,
+    .rating i.fas {
+        color: #ffaa00;
+    }
+    .video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+        background-color: #000; /* Fallback color */
+    }
+
+    .video-background video {
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+    }
+
+    .content-overlay {
+        position: relative;
+        z-index: 1;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 800px;
+        margin: 50px auto;
+    }
+    .recipe-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    .recipe-table th, .recipe-table td {
+        border: 1px solid #ddd;
+        padding: 20px; /* Adjusted padding */
+    }
+    .recipe-table th {
+        background-color: #f2f2f2;
+        text-align: left;
+    }
+    .recipe-table td a {
+        margin-right: 20px; /* Increased margin */
+    }
+    .recipe-table td form {
+        display: inline;
+    }
+    .btn {
+        padding: 10px 20px; /* Increased padding */
+        font-size: 1em;
+        margin-right: 10px; /* Increased margin */
+    }
+    #addFromAI {
+        margin-top: 20px;
+    }
+    #addFromAI input, #addFromAI button {
+        padding: 10px;
+        font-size: 1em;
+    }
+    #aiRecipeResponse {
+        margin-top: 10px;
+    }
+
+    .login-container {
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 40px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-container h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .login-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .login-form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .login-form input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    .login-form .btn-block {
+        width: 100%;
+        padding: 12px;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .register-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .register-link a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .login-header h3 {
+        color: #333;
+        font-size: 28px;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px rgba(74,144,226,0.5);
+        animation: glow 1.5s ease-in-out infinite alternate;
+    }
+    video {
+        animation: slowmotion 10s linear infinite;
+    }
+
+    @keyframes slowmotion {
+        0% {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+    
+    @keyframes glow {
+        from {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #4a90e2, 0 0 20px #4a90e2, 0 0 35px #4a90e2, 0 0 40px #4a90e2, 0 0 50px #4a90e2;
+        }
+        to {
+            text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #4a90e2, 0 0 40px #4a90e2, 0 0 70px #4a90e2, 0 0 80px #4a90e2, 0 0 100px #4a90e2;
+        }
+    }
+    
+    .decorative-image {
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 200px;
+        height: 200px;
+        background-image: url('{% static "logo.png" %}');
+        background-size: cover;
+        background-position: center;
+        border-radius: 50%;
+        z-index: 10;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    /* Adjust the content to make room for the image */
+    .content-overlay {
+        margin-right: 240px; /* Adjust based on image size */
+    }
+
+    /* Make sure the image doesn't overlap with the login form */
+    @media (max-width: 768px) {
+        .decorative-image {
+            display: none;
+        }
+        .content-overlay {
+            margin-right: auto;
+        }
+    }
+
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded and parsed');
+        
+        var stars = document.querySelectorAll('.rating i');
+        console.log('Found ' + stars.length + ' star elements');
+        
+        stars.forEach(function(star) {
+            console.log('Attaching event listener to star with rating: ' + star.dataset.rating);
+            star.addEventListener('click', function() {
+                console.log('Star clicked: ' + this.dataset.rating);
+                var rating = this.dataset.rating;
+                var parent = this.parentElement;
+                var allStars = parent.querySelectorAll('i');
+                
+                allStars.forEach(function(s) {
+                    if (s.dataset.rating <= rating) {
+                        s.classList.remove('far');
+                        s.classList.add('fas');
+                    } else {
+                        s.classList.remove('fas');
+                        s.classList.add('far');
+                    }
+                });
+
+                // Save rating to session storage
+                var recipeId = parent.dataset.recipeId;
+                sessionStorage.setItem('rating_' + recipeId, rating);
+            });
+
+            star.addEventListener('mouseover', function() {
+                var rating = this.dataset.rating;
+                var parent = this.parentElement;
+                var allStars = parent.querySelectorAll('i');
+                
+                allStars.forEach(function(s) {
+                    if (s.dataset.rating <= rating) {
+                        s.classList.add('fas');
+                        s.classList.remove('far');
+                    } else {
+                        s.classList.add('far');
+                        s.classList.remove('fas');
+                    }
+                });
+            });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.add-to-shopping-list').forEach(button => {
+            button.addEventListener('click', function() {
+                const recipeId = this.dataset.recipeId;
+                const button = this;
+                fetch(`/shopping-list/add/${recipeId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        button.textContent = 'Added';
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-secondary');
+                        button.disabled = true;
+                    } else {
+                        alert('Failed to add recipe to shopping list.');
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

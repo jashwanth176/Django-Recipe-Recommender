@@ -1,0 +1,39 @@
+{% extends 'recipes/base.html' %}
+
+{% block title %}Login - Smart Recipe Recommendation Platform{% endblock %}
+
+{% block content %}
+    <div class="login-container">
+        <div class="login-header">
+            <h3 style="font-size: 1.3em;">Welcome Back</h3>
+            <p style="font-size: 1.3em;">Log in to access your recipes</p>
+        </div>
+        <form method="post" action="{% url 'login' %}" class="login-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group" style="font-size: 1.3em;">
+                    <div class="input-group">
+                        <span class="input-group-icon">
+                            <i class="fas fa-{% if field.name == 'username' %}user{% else %}lock{% endif %}"></i>
+                        </span>
+                        {{ field }}
+                    </div>
+                    {% if field.errors %}
+                        <div class="error-message" style="font-size: 1.3em;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block" style="font-size: 1.3em;">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </button>
+            </div>
+        </form>
+        <div class="login-footer">
+            <p class="register-link" style="font-size: 1.3em;">New to our platform? <a href="{% url 'register' %}">Create an account</a></p>
+        </div>
+    </div>
+{% endblock %}

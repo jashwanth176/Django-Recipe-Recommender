@@ -1,0 +1,318 @@
+{% extends 'recipes/base.html' %}
+{% load static %}
+
+{% block title %}Diet Plan - Smart Recipe Management Platform{% endblock %}
+
+{% block content %}
+<style>
+    /* Custom styles for diet plan page */
+    .diet-plan-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background-color: #f8f9fa;
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .submit-btn {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .meal-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        color: #2c3e50;
+    }
+
+    .meal-card-header {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white;
+        padding: 1rem 1.5rem;
+    }
+
+    .meal-card-header h3 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .meal-card-body {
+        padding: 1.5rem;
+        color: #2c3e50;
+    }
+
+    .meal-section {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .meal-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .meal-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .macro-box {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .ingredient-list {
+        list-style: none;
+        padding-left: 0;
+        color: #2c3e50;
+    }
+
+    .ingredient-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .instruction-list {
+        padding-left: 1.2rem;
+        color: #2c3e50;
+    }
+
+    .instruction-list li {
+        padding: 0.5rem 0;
+    }
+
+    .macro-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .macro-item {
+        background: #f8f9fa;
+        padding: 0.75rem;
+        border-radius: 8px;
+        text-align: center;
+        color: #2c3e50;
+    }
+
+    .macro-item strong {
+        color: #2c3e50;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .macro-item span {
+        color: #2c3e50;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .diet-plan-container {
+            padding: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+        }
+
+        .form-container {
+            padding: 1.5rem;
+        }
+    }
+
+    .meal-section h6 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .ingredient-list li, .instruction-list li {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+<div class="diet-plan-container">
+    <h1 class="page-title">Create Your Diet Plan</h1>
+    
+    <div class="form-container">
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+        
+        <form method="get" action="{% url 'diet_plan' %}">
+            <div class="form-group mb-4">
+                <label class="form-label" for="diet">Diet Type</label>
+                <select name="diet" id="diet" class="form-control" required>
+                    <option value="">Select Diet Type</option>
+                    <option value="balanced" {% if diet == 'balanced' %}selected{% endif %}>Balanced</option>
+                    <option value="high-protein" {% if diet == 'high-protein' %}selected{% endif %}>High-Protein</option>
+                    <option value="low-carb" {% if diet == 'low-carb' %}selected{% endif %}>Low-Carb</option>
+                    <option value="vegetarian" {% if diet == 'vegetarian' %}selected{% endif %}>Vegetarian</option>
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label class="form-label" for="age">Age</label>
+                        <input type="number" name="age" id="age" class="form-control" value="{{ age }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label class="form-label" for="gender">Gender</label>
+                        <select name="gender" id="gender" class="form-control" required>
+                            <option value="">Select Gender</option>
+                            <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
+                            <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label class="form-label" for="height">Height (cm)</label>
+                        <input type="number" name="height" id="height" class="form-control" value="{{ height }}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-4">
+                        <label class="form-label" for="weight">Weight (kg)</label>
+                        <input type="number" name="weight" id="weight" class="form-control" value="{{ weight }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label" for="goal">Goal</label>
+                <select name="goal" id="goal" class="form-control" required>
+                    <option value="maintain-weight" {% if goal == 'maintain-weight' %}selected{% endif %}>Maintain Weight</option>
+                    <option value="lose-weight" {% if goal == 'lose-weight' %}selected{% endif %}>Lose Weight</option>
+                    <option value="gain-weight" {% if goal == 'gain-weight' %}selected{% endif %}>Gain Weight</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submit-btn w-100">Generate Meal Plan</button>
+        </form>
+    </div>
+
+    {% if meal_plan %}
+    <div class="meal-plan-section">
+        <h2 class="page-title" style="font-size: 2rem;">Your Weekly Meal Plan</h2>
+        {% for day, meals in meal_plan.items %}
+        <div class="meal-card">
+            <div class="meal-card-header">
+                <h3>{{ day }}</h3>
+            </div>
+            <div class="meal-card-body">
+                {% for meal_type, recipe in meals.items %}
+                <div class="meal-section">
+                    <h4 class="meal-title">{{ meal_type }}: {{ recipe.recipeName }}</h4>
+                    
+                    <div class="macro-grid">
+                        <div class="macro-item">
+                            <strong>Calories</strong>
+                            {{ recipe.macros.calories.amount }}{{ recipe.macros.calories.unit }}
+                        </div>
+                        <div class="macro-item">
+                            <strong>Protein</strong>
+                            {{ recipe.macros.proteins.amount }}{{ recipe.macros.proteins.unit }}
+                        </div>
+                        <div class="macro-item">
+                            <strong>Carbs</strong>
+                            {{ recipe.macros.carbs.amount }}{{ recipe.macros.carbs.unit }}
+                        </div>
+                        <div class="macro-item">
+                            <strong>Fats</strong>
+                            {{ recipe.macros.fats.amount }}{{ recipe.macros.fats.unit }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="form-label">Ingredients</h6>
+                            <ul class="ingredient-list">
+                                {% for ingredient in recipe.ingredients %}
+                                <li>{{ ingredient.amount }} {{ ingredient.unit }} {{ ingredient.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="form-label">Instructions</h6>
+                            <ol class="instruction-list">
+                                {% for instruction in recipe.instructions %}
+                                <li>{{ instruction }}</li>
+                                {% endfor %}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

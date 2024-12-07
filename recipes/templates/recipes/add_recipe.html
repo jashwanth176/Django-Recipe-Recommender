@@ -1,0 +1,114 @@
+{% extends 'recipes/base.html' %}
+{% load static %}
+
+{% block title %}Add New Recipe - Smart Recipe Recommendation Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/add_recipe.css' %}">
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="add-recipe-container">
+        <h2 class="form-title mb-4">Add New Recipe</h2>
+
+        <!-- Display Success Message -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="recipe-form needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="form-row">
+                {% for field in form %}
+                    {% if field.name != 'image' and field.name != 'description' %}
+                        <div class="form-group col-md-6">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            {% if field.field.required %}
+                                <div class="valid-feedback">Looks good!</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="form-row">
+                <!-- Image Upload Field -->
+                <div class="form-group col-md-6">
+                    <label for="id_image">Recipe Image</label>
+                    <input type="file" id="id_image" name="image" class="form-control-file" accept="image/*" required>
+                    <div class="invalid-feedback">Please upload an image for the recipe.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="id_description">Description</label>
+                <textarea id="id_description" name="description" class="form-control" rows="5" required>{{ form.description.value|default:'' }}</textarea>
+                <div class="invalid-feedback">Please provide a description.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Recipe</button>
+            <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Custom JS for form validation and image preview -->
+<script>
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+
+            // Image Preview
+            var imageInput = document.getElementById('id_image');
+            imageInput.addEventListener('change', function(event) {
+                var output = document.getElementById('imagePreview');
+                if (event.target.files && event.target.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (!document.getElementById('imagePreview')) {
+                            var img = document.createElement('img');
+                            img.id = 'imagePreview';
+                            img.src = e.target.result;
+                            img.classList.add('mt-2', 'img-thumbnail', 'w-50');
+                            imageInput.parentNode.appendChild(img);
+                        } else {
+                            document.getElementById('imagePreview').src = e.target.result;
+                        }
+                    }
+                    reader.readAsDataURL(event.target.files[0]);
+                }
+            });
+        }, false);
+    })();
+</script>
+{% endblock %}
